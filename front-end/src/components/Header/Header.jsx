@@ -1,16 +1,20 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearUser } from '../../redux/slices/userSlice';
 import logo from '../../assets/argentBankLogo.png';
 import './Header.css';
 
 function Header() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const firstName = useSelector((state) => state.user.firstName);
   const token = localStorage.getItem('token');
-  const firstName = localStorage.getItem('firstName');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('firstName');
+    dispatch(clearUser());
     navigate('/sign-in');
   };
 
@@ -25,6 +29,7 @@ function Header() {
         <h1 className="sr-only">Argent Bank</h1>
       </Link>
       <div>
+        {/* !!! Vérification token détermine si Sign in ou Out !!! */}
         {token ? (
           <>
             <Link className="main-nav-item" to="/profile">

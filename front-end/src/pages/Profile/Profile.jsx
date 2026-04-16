@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+// Import useDispatch pour envoi des actions au store Redux
+import { useDispatch } from 'react-redux';
+// Import actions du userSlice
+import { setUser, updateName } from '../../redux/slices/userSlice';
 import './Profile.css';
 
 function Profile() {
-  const [user, setUser] = useState(null);
+  // Modification en setUserState pour éviter conflit avec Redux "setUser"
+  const [user, setUserState] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const navigate = useNavigate();
+  // La fonction qui envoie les actions au store Redux
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -25,16 +32,20 @@ function Profile() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setUser(data.body);
+        setUserState(data.body);
         setFirstName(data.body.firstName);
         setLastName(data.body.lastName);
-        localStorage.setItem('firstName', data.body.firstName);
+        // Remplacement localStorage.setItem par un dispatch Redux. Lecture data direct de redux pour Header
+        dispatch(setUser({
+          firstName: data.body.firstName,
+          lastName: data.body.lastName,
+        }));
       })
       .catch(() => {
         navigate('/sign-in');
       });
-  }, [navigate]);
-
+  // Dispatch ajouté dans les dépendances du useEffect
+  }, [navigate, dispatch]);
 
   const handleSave = () => {
     const token = localStorage.getItem('token');
@@ -49,8 +60,12 @@ function Profile() {
     })
       .then((res) => res.json())
       .then((data) => {
-        setUser(data.body);
-        localStorage.setItem('firstName', data.body.firstName);
+        setUserState(data.body);
+        // Remplace localStorage.setItem par dispatch Redux. MàJ et render auto pour le header
+        dispatch(updateName({
+          firstName: data.body.firstName,
+          lastName: data.body.lastName,
+        }));
         setIsEditing(false);
       })
       .catch(() => {
