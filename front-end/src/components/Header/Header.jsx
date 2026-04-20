@@ -10,6 +10,7 @@ function Header() {
   const dispatch = useDispatch();
 
   const firstName = useSelector((state) => state.user.firstName);
+  const lastName = useSelector((state) => state.user.lastName);
   const token = localStorage.getItem('token');
 
   const handleLogout = () => {
@@ -29,12 +30,12 @@ function Header() {
         <h1 className="sr-only">Argent Bank</h1>
       </Link>
       <div>
-        {/* !!! Vérification token détermine si Sign in ou Out !!! */}
         {token ? (
           <>
             <Link className="main-nav-item" to="/profile">
               <i className="fa fa-user-circle"></i>
-              {firstName}
+              {/* Affiche prénom + nom depuis Redux */}
+              {firstName} {lastName}
             </Link>
             <button className="main-nav-item" onClick={handleLogout}>
               <i className="fa fa-sign-out"></i>
